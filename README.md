@@ -9,16 +9,16 @@ This is a Singleton PHP wrapper that utilizes the PHP [MySQLi] class. It is mean
 API Methods
 -----------
 
-`Database::connect()` - Connects to the database
-`Database::disconnect()` - Disconnects from the database
-`Database::query()` - Performs an "advanced" query and gets the results if needed
-`Database::get()` - Gets information from the database
-`Database::where()` - Specifies a where clause for the action you perform.
-`Database::update()` - Updates information from the database
-`Database::delete()` - Deletes information from the database
-`Database::insert()` - Inserts information into the database
-`Database::instance()` - Gets the once-instantiated instance of this class
-`Database::num_rows()` - Gets the number of rows for `Database::get()` command without actually returning the data
++ `Database::connect()` - Connects to the database
++ `Database::disconnect()` - Disconnects from the database
++ `Database::query()` - Performs an "advanced" query and gets the results if needed
++ `Database::get()` - Gets information from the database
++ `Database::where()` - Specifies a where clause for the action you perform.
++ `Database::update()` - Updates information from the database
++ `Database::delete()` - Deletes information from the database
++ `Database::insert()` - Inserts information into the database
++ `Database::instance()` - Gets the once-instantiated instance of this class
++ `Database::num_rows()` - Gets the number of rows for `Database::get()` command without actually returning the data
 
 Example Usages
 --------------
