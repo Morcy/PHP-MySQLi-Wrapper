@@ -23,12 +23,33 @@ API Methods
 Example Usages
 --------------
 
-Adding some data into a table:
+Inserting some data into a table:
 
     $data = array( 'foo' => 'bar' );
     Database::connect();
     Database::where( 'foobar', true );
     Database::insert( 'my_table', $data );
+    Database::disconnect();
+
+Removing data from a table:
+
+    Database::connect();
+    Database::where( 'foobar', true );
+    Database::where( 'foo', 'bar' );
+    Database::delete( 'my_table' );
+    Database::disconnect();
+
+Getting data from a table:
+
+    Database::connect();
+    Database::where( 'foobar', true );
+    $records = Database::get( 'my_table' );
+    Database::disconnect();
+
+Advanced Query:
+
+    Database::connect();
+    $records = Database::query( 'SELECT * FROM foo WHERE foobar = true AND foo IN ( SELECT bar FROM foo_db WHERE foo = 'bar' );' );
     Database::disconnect();
 
 [MySQLi]: http://php.net/mysqli
