@@ -6,7 +6,7 @@
  * Time: 2:52 AM
  */
 
-class Database{
+class Database {
 
 	/**
 	 * @var Database contains the single instance of this class adhering to the principle of singleton's
@@ -46,12 +46,12 @@ class Database{
 	/**
 	 * Blank constructor
 	 */
-	public function __construct(){}
+	public function __construct() {}
 
 	/**
 	 * Closes the database connection if it was left open for any reason
 	 */
-	public function __destruct(){
+	public function __destruct() {
 		self::disconnect( true );
 	}
 
@@ -62,7 +62,7 @@ class Database{
 	 *
 	 * @return Database The singleton instance of this class. Only ever instantiated but one time.
 	 */
-	public static function instance(){
+	public static function instance() {
 		if( !( self::$_instance instanceof self ) )
 			self::$_instance = new self();
 
@@ -73,7 +73,7 @@ class Database{
 	 * If the Database timed our for any reason, we protect errors by closing out the socket to the Database through the
 	 * MySQLi object. Otherwise, this handles connecting to the MySQL database specified in the config file.
 	 */
-	public static function connect(){
+	public static function connect() {
 		self::disconnect();
 		self::$_mysql = new mysqli( Config::$db_host, Config::$db_username, Config::$db_password, Config::$db_database );
 	}
@@ -82,12 +82,24 @@ class Database{
 	 * If we had previously connected to the MySQL database, this function will disconnect from the MySQL server and
 	 * close the socket.
 	 */
-	public static function disconnect(){
-		if( false === self::$_mysql || !( self::$_mysql instanceof mysqli ) )
+	public static function disconnect() {
+		if( !self::$_mysql || !( self::$_mysql instanceof mysqli ) )
 			return;
 
 		self::$_mysql->close();
 		self::$_mysql = false;
+	}
+
+	/**
+	 * Switches to a selected database on the MySQLi socket
+	 *
+	 * @param string $database The database we need to switch to.
+	 */
+	public static function switch_database( $database = '' ) {
+		if( !self::$_mysql || !( self::$_mysql instanceof mysqli ) )
+			return;
+
+		self::$_mysql->select_db( $database );
 	}
 
 	/**
@@ -98,7 +110,7 @@ class Database{
 	 * @param bool $get_results Indicates whether or not we need the results returned to us.
 	 * @return array|bool Data is returned if we're expecting the results back, otherwise true for the query performed.
 	 */
-	public static function query( $query = '', $get_results = true ){
+	public static function query( $query = '', $get_results = true ) {
 		self::$_query = $query;
 		$statement = self::_prepare_query();
 		self::_execute( $statement );
@@ -118,7 +130,7 @@ class Database{
 	 * @param array $fields The fields to get; asterisk indicates to get all fields.
 	 * @return array Returns the results from the MySQLi query, namely an associative array containing the data requested.
 	 */
-	public static function get( $table = '', $num_rows = false, $fields = array( '*' ) ){
+	public static function get( $table = '', $num_rows = false, $fields = array( '*' ) ) {
 		if( ! is_array( $fields ) )
 			$fields = array( $fields );
 
@@ -136,7 +148,7 @@ class Database{
 	 * @param string $table The table to delete information from.
 	 * @return bool Indicates whether or not our delete request actually affected rows contained within the specified table.
 	 */
-	public static function delete( $table = '' ){
+	public static function delete( $table = '' ) {
 		self::_set_query_type( 'DELETE' );
 		self::$_query = ' DELETE FROM ' . $table;
 		$statement = self::_build_query();
@@ -153,7 +165,7 @@ class Database{
 	 * @param array $data The data to be inserted into the table
 	 * @return bool Indicates whether or not the insertion affected any rows contained within the table. True if inserted, False if not inserted.
 	 */
-	public static function insert( $table = '', $data = array() ){
+	public static function insert( $table = '', $data = array() ) {
 		self::_set_query_type( 'INSERT' );
 		self::$_query = 'INSERT INTO ' . $table;
 		self::$_query_data = $data;
@@ -171,7 +183,7 @@ class Database{
 	 * @param array $data The data used to be updated
 	 * @return bool Indicates whether or not the insertion affected any rows contained within the table.
 	 */
-	public static function update( $table = '', $data = array() ){
+	public static function update( $table = '', $data = array() ) {
 		self::_set_query_type( 'UPDATE' );
 		self::$_query = 'UPDATE ' . $table . ' SET ';
 		self::$_query_data = $data;
@@ -191,7 +203,7 @@ class Database{
 	 * @param array $fields The fields that you want MySQL to care about when performing the command
 	 * @return integer returns the number of rows affected by the MySQL query
 	 */
-	public static function num_rows( $table = '', $num_rows = false, $fields = array( '*' ) ){
+	public static function num_rows( $table = '', $num_rows = false, $fields = array( '*' ) ) {
 		self::_set_query_type( 'GET' );
 		self::$_query = 'SELECT ' . implode( ', ', $fields ) . ' FROM ' . $table;
 		$statement = self::_build_query( $num_rows );
@@ -206,7 +218,7 @@ class Database{
 	 * @param string $field The field from the table we are using to filter with the where
 	 * @param mixed $value The value for the correlated field specified
 	 */
-	public static function where( $field = '', $value = '' ){
+	public static function where( $field = '', $value = '' ) {
 		self::$_where[ $field ] = $value;
 	}
 
@@ -215,7 +227,7 @@ class Database{
 	 *
 	 * @param string $type
 	 */
-	private static function _set_query_type( $type = '' ){
+	private static function _set_query_type( $type = '' ) {
 		self::$_query_type = $type;
 	}
 
@@ -224,7 +236,7 @@ class Database{
 	 *
 	 * @param mysqli_stmt $statement The MySQLi statement for the current query being built
 	 */
-	private static function _bind_variables( $statement ){
+	private static function _bind_variables( $statement ) {
 		if( 0 === count( self::$_variable_binds ) )
 			return;
 
@@ -248,7 +260,7 @@ class Database{
 	 * @param bool $num_rows Number of rows to add as a limit for the MySQLi query
 	 * @return mysqli_stmt returns the MySQLi statement with the variables properly bound to it
 	 */
-	private static function _build_query( $num_rows = false ){
+	private static function _build_query( $num_rows = false ) {
 		self::_build_insert_clause();
 		self::_build_update_clause();
 		self::_append_where_clause();
@@ -264,7 +276,7 @@ class Database{
 	 * Builds the insertion portion of the MySQLi query and binds any information the user might have passed to the
 	 * parent wrapper function.
 	 */
-	private static function _build_insert_clause(){
+	private static function _build_insert_clause() {
 		if( 'INSERT' !== self::$_query_type || empty( self::$_query_data ) )
 			return;
 
@@ -282,13 +294,13 @@ class Database{
 	 * Builds the update portion of the MySQLi query and binds any information the user might have passed to the
 	 * parent wrapper function.
 	 */
-	private static function _build_update_clause(){
+	private static function _build_update_clause() {
 		if( 'UPDATE' !== self::$_query_type || empty( self::$_query_data ) )
 			return;
 
 		$clauses = array();
 		$this_scope = self::instance();
-		array_walk( self::$_query_data, function( $item, $key ) use( &$clauses, &$this_scope ){
+		array_walk( self::$_query_data, function( $item, $key ) use( &$clauses, &$this_scope ) {
 			$clauses[] = $key . '= ?';
 			$this_scope->add_variable_binding( $item );
 		} );
@@ -300,12 +312,12 @@ class Database{
 	 * Takes care of appending the where portion of the MySQLi query. Also binds the data to the MySQLi statement as
 	 * specified in prior where() clauses
 	 */
-	private static function _append_where_clause(){
+	private static function _append_where_clause() {
 		if( empty( self::$_where ) )
 			return '';
 
 		$clauses = array();
-		foreach( self::$_where as $field => $value ){
+		foreach( self::$_where as $field => $value ) {
 			$clauses[] = $field . ' = ?';
 			self::add_variable_binding( $value );
 		}
@@ -319,7 +331,7 @@ class Database{
 	 *
 	 * @param mixed $value Data to be bound to the MySQLi statement later on.
 	 */
-	public static function add_variable_binding( $value ){
+	public static function add_variable_binding( $value ) {
 		self::$_variable_binds[] = array(
 			'type' => self::_determine_variable_type( $value ),
 			'value' => $value
@@ -332,7 +344,7 @@ class Database{
 	 * @param mixed $value Value to be assessed
 	 * @return string character indicating the type of the value passed.
 	 */
-	private static function _determine_variable_type( $value = '' ){
+	private static function _determine_variable_type( $value = '' ) {
 		return substr( gettype( $value ), 0, 1 );
 	}
 
@@ -341,7 +353,7 @@ class Database{
 	 *
 	 * @return mysqli_stmt The prepared MySQLi statement
 	 */
-	private static function _prepare_query(){
+	private static function _prepare_query() {
 		if( !( $statement = self::$_mysql->prepare( self::$_query ) ) )
 			trigger_error( 'Query could not be prepared.<br/>Query: <b>' . self::$_query . '</b><br/>' . self::$_mysql->error, E_USER_ERROR );
 
@@ -353,7 +365,7 @@ class Database{
 	 *
 	 * @param mysqli_stmt $statement The MySQLi statement that was prepared and is now ready to be executed
 	 */
-	private static function _execute( $statement ){
+	private static function _execute( $statement ) {
 		$statement->execute();
 		$statement->store_result();
 		self::_reset_cache();
@@ -362,7 +374,7 @@ class Database{
 	/**
 	 * Resets the internal cache for various things that are needed on a per-query basis.
 	 */
-	private static function _reset_cache(){
+	private static function _reset_cache() {
 		self::$_query = '';
 		self::$_query_type = '';
 		self::$_where = array();
@@ -377,7 +389,7 @@ class Database{
 	 * @param mysqli_stmt $statement The MySQLi statement to fetch the results from.
 	 * @return array Container for all information the statement stored after executing
 	 */
-	private static function _fetch_results( $statement ){
+	private static function _fetch_results( $statement ) {
 		$params = array();
 		$results = array();
 		$metadata = $statement->result_metadata();
@@ -387,9 +399,9 @@ class Database{
 
 		call_user_func_array( array( $statement, 'bind_result' ), $params );
 
-		while( $statement->fetch() ){
+		while( $statement->fetch() ) {
 			$tmp = array();
-			foreach( $row as $key => $value ){
+			foreach( $row as $key => $value ) {
 				if( is_string( $value ) )
 					$value = stripslashes( $value );
 

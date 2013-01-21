@@ -19,6 +19,7 @@ API Methods
 + `Database::insert()` - Inserts information into the database
 + `Database::instance()` - Gets the once-instantiated instance of this class
 + `Database::num_rows()` - Gets the number of rows for `Database::get()` command without actually returning the data
++ `Database::switch_database()` - Switches to a different database
 
 Example Usages
 --------------
