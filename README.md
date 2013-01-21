@@ -23,7 +23,8 @@ API Methods
 Example Usages
 --------------
 
-Adding some data into a table.
+Adding some data into a table:
+
     $data = array( 'foo' => 'bar' );
     Database::connect();
     Database::where( 'foobar', true );
