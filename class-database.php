@@ -163,7 +163,7 @@ class Database {
 	 *
 	 * @param string $table the table to insert the data to
 	 * @param array $data The data to be inserted into the table
-	 * @return bool Indicates whether or not the insertion affected any rows contained within the table. True if inserted, False if not inserted.
+	 * @return bool Indicates whether or not the insertion affected any rows contained within the table. Returns the insert ID of the newly added record or, False if not inserted.
 	 */
 	public static function insert( $table = '', $data = array() ) {
 		self::_set_query_type( 'INSERT' );
@@ -172,7 +172,7 @@ class Database {
 		$statement = self::_build_query();
 		self::_execute( $statement );
 
-		return ( 0 < $statement->affected_rows ) ? true : false;
+		return ( 0 < $statement->affected_rows ) ? $statement->insert_id : false;
 	}
 
 	/**
